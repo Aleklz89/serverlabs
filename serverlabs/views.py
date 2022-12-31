@@ -1,4 +1,5 @@
 from flask import jsonify, request
+from flask_smorest import abort
 
 from serverlabs import app
 
@@ -12,7 +13,7 @@ USERS = [
 CATEGORIES = [
     {
         "id": 1,
-        "name": "Food",
+        "name": "Food"
     },
 ]
 
@@ -21,44 +22,86 @@ NOTES = [
         "id": 1,
         "user_id": 1,
         "category_id": 1,
-        "date_time": (2022, 23, 10, 18, 54),
+        "date_time": [2023, 23, 10, 18, 54],
         "cost": 3000
     },
 ]
 
-# GET /users
-# POST /user
+
+@app.route("/user", methods=['POST'])
+def create_user():
+    new_user = request.get_json()
+    try:
+        if new_user["name"]:
+            id_presence = False
+            user_id = 1
+            while not id_presence:
+                id_exist = next((user for user in USERS if user["id"] == user_id), None)
+                if id_exist:
+                    user_id += 1
+                else:
+                    id_presence = True
+            user = {
+                "id": user_id,
+                "name": new_user["name"]
+            }
+            USERS.append(user)
+            return jsonify(user)
+        else:
+            return jsonify({"Bad request": "Some parameters missed."})
+    except Exception:
+        return jsonify({"Bad request": "Wrong data."})
 
 
 @app.route("/users")
 def get_users():
-    return jsonify({"users": USERS})
-
-
-@app.route("/user", methods=['POST'])
-def create_user():
-    user_data = request.get_json()
-    USERS.append(user_data)
-    print(USERS)
-    return jsonify(user_data)
-
-# GET /categories
-# POST /category
-
-
-@app.route("/categories")
-def get_categories():
-    return jsonify({"categories": CATEGORIES})
+    cur_ui = request.args.get('id', default=None, type=int)
+    if cur_ui:
+        user_exist = next((user for user in USERS if user["id"] == cur_ui), None)
+        if user_exist:
+            return jsonify({"user": user_exist})
+        else:
+            return jsonify({"error": "User not found."})
+    else:
+        return jsonify({"users": USERS})
 
 
 @app.route("/category", methods=['POST'])
 def create_category():
-    category_data = request.get_json()
-    CATEGORIES.append(category_data)
-    return jsonify(category_data)
+    new_category = request.get_json()
+    try:
+        if new_category["name"]:
+            id_presence = False
+            category_id = 1
+            while not id_presence:
+                id_exist = next((category for category in CATEGORIES if category["id"] == category_id), None)
+                if id_exist:
+                    category_id += 1
+                else:
+                    id_presence = True
+            category = {
+                "id": category_id,
+                "name": new_category["name"]
+            }
+            CATEGORIES.append(category)
+            return jsonify(category)
+        else:
+            return jsonify({"error": "Not all parameters set."})
+    except Exception:
+        return jsonify({"error": "Invalid category data."})
 
-# GET /categories
-# POST /category
+
+@app.route("/categories")
+def get_categories():
+    category_id = request.args.get('id', default=None, type=int)
+    if category_id:
+        category_exist = next((category for category in CATEGORIES if category["id"] == category_id), None)
+        if category_exist:
+            return jsonify({"category": category_exist})
+        else:
+            return jsonify({"error": "Category not found."})
+    else:
+        return jsonify({"categories": CATEGORIES})
 
 
 @app.route("/notes")
@@ -68,9 +111,33 @@ def get_notes():
 
 @app.route("/note", methods=['POST'])
 def create_notes():
-    note_data = request.get_json()
-    NOTES.append(note_data)
-    return jsonify(note_data)
+    note_id = request.args.get('id', default=None, type=int)
+    user_id = request.args.get('user_id', default=None, type=int)
+    category_id = request.args.get('category_id', default=None, type=int)
+    if note_id:
+        found_note = next((note for note in NOTES if note["id"] == note_id), None)
+        if found_note:
+            return jsonify({"note": found_note})
+        else:
+            return jsonify({"error": "Note not found."})
+    else:
+        if user_id:
+            if category_id:
+                notes = list(
+                    filter(lambda note: note['user_id'] == user_id and note["category_id"] == category_id,
+                           NOTES))
+                if len(notes) > 0:
+                    return jsonify({"notes": notes})
+                else:
+                    return jsonify({"error": "Notes from this user in this category not found."})
+            else:
+                notes = list(filter(lambda note: note['user_id'] == user_id, NOTES))
+                if len(notes) > 0:
+                    return jsonify({"notes": notes})
+                else:
+                    return jsonify({"error": "Notes from this user not found."})
+        else:
+            return jsonify({"notes": NOTES})
 
 
 @app.route("/user_notes")
@@ -78,16 +145,16 @@ def user_notes():
     note_id = request.args.get('id', default=None, type=int)
     user_id = request.args.get('user_id', default=None, type=int)
     if note_id:
-        found_note = next((record for record in NOTES if record["id"] == note_id), None)
+        found_note = next((note for note in NOTES if note["id"] == note_id), None)
         if found_note:
             return jsonify({"note": found_note})
         else:
             return jsonify({"error": "Note not found."})
     else:
         if user_id:
-            records = list(filter(lambda record: record['user_id'] == user_id, NOTES))
-            if len(records) > 0:
-                return jsonify({"notes": records})
+            notes = list(filter(lambda note: note['user_id'] == user_id, NOTES))
+            if len(notes) > 0:
+                return jsonify({"notes": notes})
             else:
                 return jsonify({"error": "Notes from this user not found."})
         else:
