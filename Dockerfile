@@ -11,4 +11,4 @@ COPY serverlabs /opt/serverlabs
 
 WORKDIR /opt
 
-CMD flask --app serverlabs run --host 0.0.0.0 -p $PORT
+CMD flask run --host 0.0.0.0 -p $PORT
