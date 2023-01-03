@@ -5,6 +5,7 @@ from flask.views import MethodView
 from flask_smorest import Blueprint, abort
 
 from serverlabs.db import users
+from serverlabs.schemas import UserSchema
 
 blp = Blueprint("user", __name__, description="Operations on user")
 
@@ -31,10 +32,8 @@ class UserList(MethodView):
     def get(self):
         return list(users.values())
 
-    def post(self):
-        user_data = request.get_json()
-        if "name" not in user_data:
-            abort(400, message="Need name to create user")
+    @blp.arguments(UserSchema)
+    def post(self, user_data):
         if user_data["name"] in [u["name"] for u in users.values()]:
             abort(400, message="Name must be unique")
         user_id = uuid.uuid4().hex

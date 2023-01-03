@@ -5,6 +5,7 @@ from flask.views import MethodView
 from flask_smorest import Blueprint
 
 from serverlabs.db import categories
+from serverlabs.schemas import CategorySchema
 
 blp = Blueprint("category", __name__, description="Operations on category")
 
@@ -20,8 +21,8 @@ class CategoryList(MethodView):
     def get(self):
         return list(categories.values())
 
-    def post(self):
-        category_data = request.get_json()
+    @blp.arguments(CategorySchema)
+    def post(self, category_data):
         category_id = uuid.uuid4().hex
         category = {
             "id": category_id,
