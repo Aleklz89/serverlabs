@@ -1,13 +1,7 @@
-import uuid
-from datetime import datetime
-
-from flask import jsonify, request
-from flask_smorest import abort, Api
+from flask_smorest import Api
 
 from serverlabs import app
-from serverlabs.bl import get_records_by_filter
 
-from serverlabs.db import categories, users, records
 
 
 from serverlabs.resources.user import blp as UserBlueprint
