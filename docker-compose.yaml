@@ -1,14 +1,14 @@
 version: '3'
 
 services:
-   serverlabs:
-     restart: always
-     build:
-       context: .
-       dockerfile: Dockerfile
-     volumes: ["./serverlabs:/opt/serverlabs"]
-     environment:
-       PORT: "5005"
-       FLASK_DEBUG: "true"
-     ports:
-       - "5005:5005"
+  files:
+    restart: always
+    build:
+      context: .
+      dockerfile: Dockerfile
+    volumes: [".:/opt"]
+    environment:
+      PORT: "5000"
+      FLASK_DEBUG: "true"
+    ports:
+      - "5000:5000"
