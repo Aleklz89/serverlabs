@@ -11,12 +11,14 @@ blp = Blueprint("user", __name__, description="Operations on user")
 
 @blp.route("/user/<string:user_id>")
 class User(MethodView):
+    @blp.response(200, UserSchema)
     def get(self, user_id):
         try:
             return users[user_id]
         except KeyError:
             abort(404, message="User not found")
 
+    @blp.response(200, UserSchema)
     def delete(self, user_id):
         try:
             deleted_user = users[user_id]
@@ -28,10 +30,12 @@ class User(MethodView):
 
 @blp.route("/user")
 class UserList(MethodView):
+    @blp.response(200, UserSchema(many=True))
     def get(self):
         return list(users.values())
 
     @blp.arguments(UserSchema)
+    @blp.response(200, UserSchema)
     def post(self, user_data):
         if user_data["name"] in [u["name"] for u in users.values()]:
             abort(400, message="Name must be unique")
