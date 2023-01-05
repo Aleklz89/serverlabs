@@ -6,6 +6,8 @@ from resources.user import blp as UserBlueprint
 from resources.category import blp as CategoryBlueprint
 from resources.record import blp as RecordBlueprint
 
+from resources.income import blp as IncomeBlueprint
+
 
 def create_app():
     app = Flask(__name__)
@@ -25,6 +27,7 @@ def create_app():
 
     api = Api(app)
 
+    api.register_blueprint(IncomeBlueprint)
     api.register_blueprint(UserBlueprint)
     api.register_blueprint(CategoryBlueprint)
     api.register_blueprint(RecordBlueprint)

@@ -21,3 +21,10 @@ class RecordSchema(Schema):
     User_ID = fields.Int(required=True, validate=validate.Range(min=1))
     Category_ID = fields.Int(required=True, validate=validate.Range(min=1))
     Amount = fields.Float(required=True, validate=validate.Range(min=0))
+
+
+
+class IncomeSchema(Schema):
+    ID = fields.Int(dump_only=True)
+    User_ID = fields.Int(required=True, validate=validate.Range(min=1))
+    User_account = fields.Float(required=True, validate=validate.Range(min=0))

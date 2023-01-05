@@ -3,7 +3,7 @@ from flask_smorest import Blueprint, abort
 from sqlalchemy.exc import IntegrityError, NoResultFound
 
 from db import db
-from models import RecordModel, CategoryModel
+from models import RecordModel, CategoryModel, IncomeModel
 from schemas import RecordSchema, RecordQuerySchema
 
 blp = Blueprint("record", __name__, description="Operations on record")
@@ -39,13 +39,22 @@ class RecordList(MethodView):
     @blp.response(200, RecordSchema)
     def post(self, record_data):
         record = RecordModel(**record_data)
+        user_id = record_data.get("User_ID")
         category_id = record_data.get("Category_ID")
 
         try:
             category = CategoryModel.query.filter(CategoryModel.ID == category_id).one()
+            income = IncomeModel.query.filter(IncomeModel.User_ID == user_id).one()
+
+            spending = income.User_account - record.Amount
+            if spending >= 0:
+                income.User_account = spending
+            else:
+                abort(400, message="A negative balance is not allowed")
 
             db.session.add(category)
             db.session.add(record)
+            db.session.add(income)
             db.session.commit()
         except NoResultFound:
             abort(404, message="Data not found")
