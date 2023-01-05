@@ -1,0 +1,28 @@
+{
+	"info": {
+		"_postman_id": "6a612641-6405-4b38-8c0c-a1c71d88bfe6",
+		"name": "Basics of API",
+		"schema": "https://schema.getpostman.com/json/collection/v2.0.0/collection.json",
+		"_exporter_id": "23818617"
+	},
+	"item": [
+		{
+			"name": "New Request",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "1q2w2dddd",
+					"options": {
+						"raw": {
+							"language": "text"
+						}
+					}
+				},
+				"url": "http://localhost:8080/"
+			},
+			"response": []
+		}
+	]
+}
