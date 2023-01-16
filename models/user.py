@@ -5,7 +5,8 @@ class UserModel(db.Model):
     __tablename__ = "user"
 
     ID = db.Column(db.Integer, primary_key=True)
-    Username = db.Column(db.String(128), unique=True, nullable=False)
+    username = db.Column(db.String(128), unique=True, nullable=False)
+    password = db.Column(db.String, nullable=False)
 
     income = db.relationship(
         "IncomeModel",
